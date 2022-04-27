@@ -41,5 +41,6 @@ JUNK_STATUS_t remove_thread_from_central_list(uint32_t id);
 JUNK_STATUS_t find_next_thread(JUNK_THREAD_t *thread);
 
 void junk_schedule(void);
+JUNK_STATUS_t junk_thread_wait(void);
 
 #endif

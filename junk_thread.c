@@ -1,6 +1,7 @@
 #include "common.h"
 
 JUNK_THREAD_t *central_thread_list = NULL;
+JUNK_THREAD_t *current_running_thread = NULL;
 
 uint32_t new_thread_id(){
     static uint32_t new_thread_id = 0;
@@ -96,7 +97,7 @@ JUNK_STATUS_t find_next_thread(JUNK_THREAD_t *thread){
 
     while (head)
     {
-        if(head->priority > priority){
+        if(head->priority > priority && head->thread_status == RUNNING){
             thread = head;
             priority = head->priority;
             status = STATUS_SUCCESS;
@@ -109,4 +110,22 @@ JUNK_STATUS_t find_next_thread(JUNK_THREAD_t *thread){
 
 void junk_schedule(void){
     
+    JUNK_THREAD_t *thread = NULL;
+    JUNK_STATUS_t status = find_next_thread(thread);
+    if(thread){
+        current_running_thread = thread;
+        thread->thread_entry_fun(NULL);
+    }
+    else{
+        DEV_ASSERT(0);
+    }
+    junk_schedule();
 }
+
+JUNK_STATUS_t junk_thread_wait(void){
+    JUNK_STATUS_t status = STATUS_ERROR;
+    current_running_thread->thread_status = WAITING;
+    /* Raise an SVC call */
+    return status;
+}
+
